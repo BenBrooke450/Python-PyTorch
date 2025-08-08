@@ -1,12 +1,18 @@
 
 
-<span style="color:red"> Note: By default, NumPy arrays are created with the datatype float64 and if you convert it to a PyTorch tensor, it'll keep the same datatype (as above).</span>
+ - <span style="color:red"> Note: By default, NumPy arrays are created with the datatype float64 and if you convert it to a PyTorch tensor, it'll keep the same datatype (as above).</span>
 
-<span style="color:red"> However, many PyTorch calculations default to using float32. </span>
+<br>
 
-<span style="color:red"> So if you want to convert your NumPy array (float64) -> PyTorch tensor (float64) -> PyTorch tensor (float32), you can use tensor = torch.from_numpy(array).type(torch.float32). </span>
+ - <span style="color:red"> However, many PyTorch calculations default to using float32. </span>
 
- <span style="color:red"> NumPy and PyTorch are both powerful libraries used for numerical computations, but they serve different purposes and have distinct features. Here's a breakdown of their relationship and differences: </span>
+<br>
+
+ - <span style="color:red"> So if you want to convert your NumPy array (float64) -> PyTorch tensor (float64) -> PyTorch tensor (float32), you can use tensor = torch.from_numpy(array).type(torch.float32). </span>
+
+<br>
+
+ - <span style="color:red"> NumPy and PyTorch are both powerful libraries used for numerical computations, but they serve different purposes and have distinct features. Here's a breakdown of their relationship and differences: </span>
 
 ### NumPy
 
