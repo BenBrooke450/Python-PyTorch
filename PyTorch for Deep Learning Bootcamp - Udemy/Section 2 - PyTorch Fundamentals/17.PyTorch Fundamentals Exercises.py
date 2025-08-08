@@ -2,7 +2,6 @@
 
 import torch
 
-#2. Create a random tensor with shape (7, 7).
 
 print(torch.rand(7,7))
 """
