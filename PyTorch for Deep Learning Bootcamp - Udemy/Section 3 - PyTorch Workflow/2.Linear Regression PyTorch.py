@@ -76,6 +76,14 @@ def plot_pred(train_data = X_train,
 
 
 class LinearregressionModel(nn.Module):
+    def __int__(self):
+        super.__init__()
+        self.weights = nn.parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
+
+        self.bias = nn.parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
+
+        def forward(self, x : torch.tensor()) -> torch.tensor():
+            return self.weights * self.bias
 
 
 
