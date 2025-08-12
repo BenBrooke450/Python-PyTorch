@@ -75,15 +75,25 @@ def plot_pred(train_data = X_train,
 #plot_pred(X_train, y_train,X_test, y_test)
 
 
-class LinearregressionModel(nn.Module):
+class LinearRegressionModel(nn.Module):
     def __int__(self):
-        super.__init__()
-        self.weights = nn.parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
+        super().__init__()
+        self.weights = nn.Parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
 
-        self.bias = nn.parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
+        self.bias = nn.Parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
 
-        def forward(self, x : torch.tensor()) -> torch.tensor():
+        def forward(self, x : torch.tensor) -> torch.tensor:
             return self.weights * self.bias
+
+
+
+"""
+nn.Module contains the larger building blocks (layers)
+nn.Parameter contains the smaller parameters like weights and biases (put these together to make nn.Module(s))
+forward() tells the larger blocks how to make calculations on inputs (tensors full of data) within nn.Module(s)
+torch.optim contains optimization methods on how to improve the parameters within nn.Parameter to better represent input data
+"""
+
 
 
 
