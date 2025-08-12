@@ -75,5 +75,26 @@ def plot_pred(train_data = X_train,
 #plot_pred(X_train, y_train,X_test, y_test)
 
 
+class LinearregressionModel(nn.Module):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
