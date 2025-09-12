@@ -1,6 +1,6 @@
 
 
-## **`torch.nn.Parameter`
+##`torch.nn.Parameter`
 
 ### **1. Definition**
 
