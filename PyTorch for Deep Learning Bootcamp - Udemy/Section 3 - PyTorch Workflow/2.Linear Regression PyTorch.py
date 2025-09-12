@@ -78,14 +78,29 @@ def plot_pred(train_data = X_train,
 class LinearRegressionModel(nn.Module):
     def __int__(self):
         super().__init__()
-        self.weights = nn.Parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
+        self.weights = nn.Parameter(torch.randn(1,dtype=torch.float),requires_grad=True)
 
-        self.bias = nn.Parameter(torch.rand(1,requires_grad=True,dtype=torch.float))
+        self.bias = nn.Parameter(torch.randn(1,dtype=torch.float),requires_grad=True)
 
-        def forward(self, x : torch.tensor) -> torch.tensor:
-            return self.weights * self.bias
+    def forward(self, x : torch.tensor) -> torch.tensor:
+        return self.weights * x + self.bias
 
 
+
+class LinearRegressionModel(nn.Module): # <- almost everything in PyTorch is a nn.Module (think of this as neural network lego blocks)
+    def __init__(self):
+        super().__init__()
+        self.weights = nn.Parameter(torch.randn(1, # <- start with random weights (this will get adjusted as the model learns)
+                                                dtype=torch.float), # <- PyTorch loves float32 by default
+                                   requires_grad=True) # <- can we update this value with gradient descent?)
+
+        self.bias = nn.Parameter(torch.randn(1, # <- start with random bias (this will get adjusted as the model learns)
+                                            dtype=torch.float), # <- PyTorch loves float32 by default
+                                requires_grad=True) # <- can we update this value with gradient descent?))
+
+    # Forward defines the computation in the model
+    def forward(self, x: torch.Tensor) -> torch.Tensor: # <- "x" is the input data (e.g. training/testing features)
+        return self.weights * x + self.bias # <- this is the linear regression formula (y = m*x + b)
 
 """
 nn.Module contains the larger building blocks (layers)
@@ -94,6 +109,15 @@ forward() tells the larger blocks how to make calculations on inputs (tensors fu
 torch.optim contains optimization methods on how to improve the parameters within nn.Parameter to better represent input data
 """
 
+
+
+#Create a random seed as we are creating these Parameters by using rand
+
+torch.manual_seed(42)
+
+model_0 = LinearRegressionModel()
+
+print(list(model_0.parameters()))
 
 
 

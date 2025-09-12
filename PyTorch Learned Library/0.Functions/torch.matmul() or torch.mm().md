@@ -32,7 +32,7 @@ tensor_A = torch.tensor([[1,2,3],[4,5,6],[7,8,9]])
 tensor_B = torch.tensor([[3,2,1],[6,5,4],[7,8,9]])
 
 print(tensor_A.shape, tensor_B.shape)
-#torch.Size([3, 3]) torch.Size([3, 3]), The inner 3]) * ([3 mst be the same
+#torch.Size([3, 3]) torch.Size([3, 3]), The inner 3]) * ([3 mst be the same])
 
 
 
