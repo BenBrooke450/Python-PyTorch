@@ -38,10 +38,26 @@ linear_layer = nn.Linear(in_features=5, out_features=3)
 # Example input: batch of 2 samples, each with 5 features
 input_tensor = torch.randn(2, 5)  # Shape: (batch_size=2, in_features=5)
 
-# Forward pass
+# Forward pass: compute y = xW^T + b
 output = linear_layer(input_tensor)
-print(output.shape)  # Output: torch.Size([2, 3])
+
+print("Input shape:", input_tensor.shape)   # Output: torch.Size([2, 5])
+print("Output shape:", output.shape)       # Output: torch.Size([2, 3])
+print("Output:\n", output)
 ```
+```python
+z = W·x + b
+```
+Where:
+
+ - W = weight matrix
+
+ - x = input vector
+
+ - b = bias vector
+
+
+<br><br><br><br>
 
 ---
 
@@ -64,6 +80,11 @@ print(output.shape)  # Output: torch.Size([2, 3])
 1. **Initialization:**
    - Weights (`W`) are initialized randomly (e.g., using Kaiming or Xavier initialization).
    - Biases (`b`) are initialized to zeros (if `bias=True`).
+
+
+
+
+
 
 2. **Forward Pass:**
    - Computes the linear transformation \(y = xW^T + b\).
@@ -100,3 +121,14 @@ model = SimpleNN()
 - **Learnable Parameters:** Weights (`W`) and biases (`b`), updated during training.
 
 `nn.Linear` is essential for tasks like classification, regression, and feature transformation in deep learning.
+
+
+<br><br><br>
+
+
+
+
+
+
+
+
