@@ -123,6 +123,48 @@ torch.manual_seed(42)
 model_0 = LinearRegressionModel()
 
 print(list(model_0.parameters()))
+"""
+[Parameter containing:
+tensor([0.3367], requires_grad=True), Parameter containing:
+tensor([0.1288], requires_grad=True)]
+"""
+
+
+print(X_test)
+"""
+tensor([[0.8000],
+        [0.8200],
+        [0.8400],
+        [0.8600],
+        [0.8800],
+        [0.9000],
+        [0.9200],
+        [0.9400],
+        [0.9600],
+        [0.9800]])
+"""
+
+
+
+
+with torch.inference_mode():
+    y_preds = model_0(X_test)
+
+
+print(y_preds)
+"""
+tensor([[0.3982],
+        [0.4049],
+        [0.4116],
+        [0.4184],
+        [0.4251],
+        [0.4318],
+        [0.4386],
+        [0.4453],
+        [0.4520],
+        [0.4588]])
+"""
+
 
 
 
