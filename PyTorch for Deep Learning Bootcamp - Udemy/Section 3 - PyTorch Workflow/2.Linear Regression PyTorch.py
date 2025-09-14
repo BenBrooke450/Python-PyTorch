@@ -190,14 +190,27 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.01)
 epochs = 1
 
 for epoch in range(epochs):
+    ### Training
 
+    # Put model in training mode (this is the default state of a model)
     model_0.train()
 
+    # 1. Forward pass on train data using the forward() method inside
     y_pred = model_0(X_train)
+    # print(y_pred)
 
+    # 2. Calculate the loss (how different are our models predictions to the ground truth)
     loss = loss_fn(y_pred, y_train)
 
+    # 3. Zero grad of the optimizer
     optimizer.zero_grad()
+
+    # 4. Loss backwards
+    loss.backward()
+
+    # 5. Progress the optimizer
+    optimizer.step()
+
 
 
 
