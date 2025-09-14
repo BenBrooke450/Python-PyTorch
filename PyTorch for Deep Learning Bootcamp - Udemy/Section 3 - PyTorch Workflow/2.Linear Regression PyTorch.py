@@ -231,6 +231,72 @@ with torch.inference_mode():
 
 
 
+train_loss_values = []
+test_loss_values = []
+epoch_count = []
+
+
+for epoch in range(epochs):
+    model_0.train()
+
+    y_pred = model_0(X_train)
+
+    loss = loss_fn(y_pred, y_train)
+
+    optimizer.zero_grad()
+
+    loss.backward()
+
+    optimizer.step()
+
+
+    # Put the model in evaluation mode
+    model_0.eval()
+
+    with torch.inference_mode():
+      # 1. Forward pass on test data, we place in the text data now NOT the training data
+      test_pred = model_0(X_test)
+
+      # 2. Caculate loss on test data
+      test_loss = loss_fn(test_pred, y_test.type(torch.float)) # predictions come in torch.float datatype, so comparisons need to be done with tensors of the same type
+
+      # Print out what's happening
+      if epoch % 10 == 0:
+            epoch_count.append(epoch)
+            train_loss_values.append(loss.detach().numpy())
+            test_loss_values.append(test_loss.detach().numpy())
+            print(f"Epoch: {epoch} | MAE Train Loss: {loss} | MAE Test Loss: {test_loss} ")
+"""
+Epoch: 0 | MAE Train Loss: 0.024458955973386765 | MAE Test Loss: 0.056463055312633514 
+Epoch: 10 | MAE Train Loss: 0.021020209416747093 | MAE Test Loss: 0.04819049686193466 
+Epoch: 20 | MAE Train Loss: 0.01758546754717827 | MAE Test Loss: 0.04060482233762741 
+Epoch: 30 | MAE Train Loss: 0.014155390672385693 | MAE Test Loss: 0.03233228251338005 
+Epoch: 40 | MAE Train Loss: 0.010716589167714119 | MAE Test Loss: 0.024059753865003586 
+Epoch: 50 | MAE Train Loss: 0.0072835348546504974 | MAE Test Loss: 0.016474086791276932 
+Epoch: 60 | MAE Train Loss: 0.003851778106763959 | MAE Test Loss: 0.008201557211577892 
+Epoch: 70 | MAE Train Loss: 0.00893248151987791 | MAE Test Loss: 0.005023092031478882 
+Epoch: 80 | MAE Train Loss: 0.00893248151987791 | MAE Test Loss: 0.005023092031478882 
+Epoch: 90 | MAE Train Loss: 0.00893248151987791 | MAE Test Loss: 0.005023092031478882 
+"""
+
+
+plt.plot(epoch_count, train_loss_values, label="Train loss")
+plt.plot(epoch_count, test_loss_values, label="Test loss")
+plt.title("Training and test loss curves")
+plt.ylabel("Loss")
+plt.xlabel("Epochs")
+plt.legend()
+
+#plt.show()
+
+
+
+
+
+
+
+
+
 
 
 
