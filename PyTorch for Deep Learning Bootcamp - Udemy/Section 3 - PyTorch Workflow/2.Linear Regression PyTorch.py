@@ -185,9 +185,9 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.01)
 
 
 
+torch.manual_seed(42)
 
-
-epochs = 1
+epochs = 100
 
 for epoch in range(epochs):
     ### Training
@@ -212,17 +212,20 @@ for epoch in range(epochs):
     optimizer.step()
 
 
+print(model_0.state_dict())
+# 10 = OrderedDict({'weights': tensor([0.3406]), 'bias': tensor([0.1388])})
+
+print(model_0.state_dict())
+# 100 = OrderedDict({'weights': tensor([0.5784]), 'bias': tensor([0.3513])})
+
+
+print(weight,bias)
+#0.7 0.3
 
 
 
-
-
-
-
-
-
-
-
+with torch.inference_mode():
+    y_preds_new = model_0(X_test)
 
 
 
