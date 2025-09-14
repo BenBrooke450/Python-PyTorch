@@ -292,6 +292,38 @@ plt.legend()
 
 
 
+from pathlib import Path
+
+
+MODEL_PATH = Path("/Users/benjaminbrooke/PycharmProjects/Python_PyTroch/PyTorch for Deep Learning Bootcamp - Udemy/Models")
+MODEL_PATH.mkdir(parents=True,exist_ok=True)
+
+
+MODEL_NAME = "01_pytorch_workflow_model_0.pth"
+MODEL_SAVE_PATH = MODEL_PATH/MODEL_NAME
+
+#torch.save(model_0.state_dict(), f = MODEL_SAVE_PATH)
+
+
+
+
+
+
+
+
+loaded_model_0 = LinearRegressionModel()
+
+loaded_model_0.load_state_dict(torch.load(f = MODEL_SAVE_PATH))
+
+print(loaded_model_0.state_dict())
+#OrderedDict({'weights': tensor([0.6990]), 'bias': tensor([0.3093])})
+
+
+
+
+
+
+
 
 
 
