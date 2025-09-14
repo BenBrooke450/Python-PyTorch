@@ -169,6 +169,40 @@ tensor([[0.3982],
 
 
 
+#Loss function
+loss_fn = nn.L1Loss()
+
+print(loss_fn)
+#L1Loss()
+
+
+
+
+#Optimizer
+optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.01)
+
+
+
+
+
+
+
+epochs = 1
+
+for epoch in range(epochs):
+
+    model_0.train()
+
+    y_pred = model_0(X_train)
+
+    loss = loss_fn(y_pred, y_train)
+
+    optimizer.zero_grad()
+
+
+
+
+
 
 
 
