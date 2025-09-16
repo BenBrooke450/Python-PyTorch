@@ -175,7 +175,7 @@ OrderedDict({'0.weight': tensor([[-0.3263, -0.4638],
 
 loss_fn = nn.BCEWithLogitsLoss()
 
-optimizer = torch.optim.SGD(params=model_0.parameters,lr=0.1)
+optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.1)
 
 
 def arccurac_fn(y_true, y_pred):
@@ -190,6 +190,48 @@ def arccurac_fn(y_true, y_pred):
 
 
 
+model_0.eval()
+with torch.inference_mode():
+    y_logits = model_0(X_test)
+
+
+
+
+print(y_logits[:5])
+"""
+tensor([[ 0.3449],
+        [ 0.3429],
+        [ 0.2013],
+        [ 0.3862],
+        [-0.0347]])
+"""
+#Logits
+
+
+
+
+
+y_pred_probs = torch.sigmoid(y_logits)
+
+#If y_pred_probs >= 0.5, y=1 (class 1)
+#If y_pred_probs < 0.5, y=0 (class 0)
+
+
+print(torch.round(y_pred_probs[:5]))
+"""
+tensor([[1.],
+        [0.],
+        [1.],
+        [0.],
+        [0.]])
+"""
+
+
+
+
+q = torch.round(y_pred_probs[:5]).squeeze()
+print(q,"/n",y_test[:5])
+#tensor([0., 0., 0., 0., 0.]) /n tensor([1., 0., 1., 0., 1.])
 
 
 
