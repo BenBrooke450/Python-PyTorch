@@ -100,6 +100,9 @@ Where:
 class SimpleNN(nn.Module):
     def __init__(self):
         super().__init__()
+        
+        # INCORRECT nn.parameter(nn.Linear(in_features=1,out_features=1)) nn.Linear is itself a layer that registers its own trainable parameters (weight and bias) inside the module.
+        
         self.fc1 = nn.Linear(784, 256)  # 784 input features → 256 hidden units
         self.fc2 = nn.Linear(256, 10)   # 256 hidden units → 10 output classes
 
