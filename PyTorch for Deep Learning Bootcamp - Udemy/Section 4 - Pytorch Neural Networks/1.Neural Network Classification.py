@@ -175,6 +175,19 @@ OrderedDict({'0.weight': tensor([[-0.3263, -0.4638],
 
 loss_fn = nn.BCEWithLogitsLoss()
 
+optimizer = torch.optim.SGD(params=model_0.parameters,lr=0.1)
+
+
+def arccurac_fn(y_true, y_pred):
+    correct = torch.eq(y_true, y_pred).sum().item()
+    acc = (correct/len(y_pred)) * 100
+    return acc
+
+
+
+
+
+
 
 
 
