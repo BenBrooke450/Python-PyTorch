@@ -173,7 +173,7 @@ OrderedDict({'0.weight': tensor([[-0.3263, -0.4638],
 
 
 
-loss_fn = nn.BCEWithLogitsLoss
+loss_fn = nn.BCEWithLogitsLoss()
 
 
 
