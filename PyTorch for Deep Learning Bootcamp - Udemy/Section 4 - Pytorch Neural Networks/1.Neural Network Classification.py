@@ -178,7 +178,7 @@ loss_fn = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.1)
 
 
-def arccurac_fn(y_true, y_pred):
+def accuracy_fn(y_true, y_pred):
     correct = torch.eq(y_true, y_pred).sum().item()
     acc = (correct/len(y_pred)) * 100
     return acc
@@ -197,6 +197,8 @@ with torch.inference_mode():
 
 
 
+
+
 print(y_logits[:5])
 """
 tensor([[ 0.3449],
@@ -211,10 +213,13 @@ tensor([[ 0.3449],
 
 
 
+
 y_pred_probs = torch.sigmoid(y_logits)
 
 #If y_pred_probs >= 0.5, y=1 (class 1)
 #If y_pred_probs < 0.5, y=0 (class 0)
+
+
 
 
 print(torch.round(y_pred_probs[:5]))
@@ -229,9 +234,104 @@ tensor([[1.],
 
 
 
+
+
 q = torch.round(y_pred_probs[:5]).squeeze()
 print(q,"/n",y_test[:5])
 #tensor([0., 0., 0., 0., 0.]) /n tensor([1., 0., 1., 0., 1.])
+
+
+
+
+
+torch.manual_seed(42)
+
+
+epoches = 100
+
+for epoch in range(epoches):
+
+    model_0.train()
+
+    y_logits = model_0(X_train).squeeze()
+
+    y_pred = torch.round(torch.sigmoid(y_logits))
+
+    loss = loss_fn(y_logits,y_train) # We pass in the logits as loss_fn = nn.BCEWithLogitsLoss() wants logits and not passed through the activation function
+
+    # loss = loss_fn(y_preds,y_train) if loss_fn = nn.BCELoss()
+
+    acc = accuracy_fn(y_true=y_train,
+                      y_pred=y_pred)
+
+    optimizer.zero_grad()
+
+    loss.backward()
+
+    model_0.eval()
+
+    with torch.inference_mode():
+
+        test_logits = model_0(X_test).squeeze()
+
+        test_pred = torch.round(torch.sigmoid(test_logits))
+
+        # 2. Caculate loss/accuracy
+        test_loss = loss_fn(test_logits,
+                            y_test)
+        test_acc = accuracy_fn(y_true=y_test,
+                               y_pred=test_pred)
+
+    # Print out what's happening every 10 epochs
+    if epoch % 10 == 0:
+        print(
+            f"Epoch: {epoch} | Loss: {loss:.5f}, Accuracy: {acc:.2f}% | Test loss: {test_loss:.5f}, Test acc: {test_acc:.2f}%")
+
+"""
+Epoch: 0 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 10 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 20 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 30 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 40 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 50 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 60 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 70 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 80 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+Epoch: 90 | Loss: 0.71997, Accuracy: 50.38% | Test loss: 0.71784, Test acc: 50.00%
+"""
+
+
+
+
+
+"""import requests
+from pathlib import Path
+
+# Download helper functions from Learn PyTorch repo (if not already downloaded)
+if Path("helper_functions.py").is_file():
+  print("helper_functions.py already exists, skipping download")
+else:
+  print("Downloading helper_functions.py")
+  request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/main/helper_functions.py")
+  with open("helper_functions.py", "wb") as f:
+    f.write(request.content)
+
+from helper_functions import plot_predictions, plot_decision_boundary
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
