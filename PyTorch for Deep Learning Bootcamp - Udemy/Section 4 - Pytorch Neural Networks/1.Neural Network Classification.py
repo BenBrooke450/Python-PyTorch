@@ -323,6 +323,246 @@ from helper_functions import plot_predictions, plot_decision_boundary
 
 
 
+class CircleModelv2(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.layer_1 = nn.Linear(in_features=2, out_features=10)
+
+        self.layer_2 = nn.Linear(in_features=10,out_features=10)
+
+        self.layer_3 = nn.Linear(in_features=10,out_features=1)
+
+
+    def forward(self,x):
+        # z = self.layer_1(x)
+        # z = self.layer_2(x)
+        # z = self.layer_3(x)
+        # return z
+        return self.layer_3(self.layer_2(self.layer_1(x)))
+
+
+model_3 = CircleModelv2()
+
+print(model_3)
+"""
+CircleModelv2(
+  (layer_1): Linear(in_features=2, out_features=10, bias=True)
+  (layer_2): Linear(in_features=10, out_features=10, bias=True)
+  (layer_3): Linear(in_features=10, out_features=1, bias=True)
+)
+"""
+
+print(model_3.state_dict())
+"""
+OrderedDict({'layer_1.weight': tensor([[ 0.5406,  0.5869],
+        [-0.1657,  0.6496],
+        [-0.1549,  0.1427],
+        [-0.3443,  0.4153],
+        [ 0.6233, -0.5188],
+        [ 0.6146,  0.1323],
+        [ 0.5224,  0.0958],
+        [ 0.3410, -0.0998],
+        [ 0.5451,  0.1045],
+        [-0.3301,  0.1802]]), 'layer_1.bias': tensor([-0.3258, -0.0829, -0.2872,  0.4691, -0.5582, -0.3260, -0.1997, -0.4252,
+         0.0667, -0.6984]), 'layer_2.weight': tensor([[ 0.2856, -0.2686,  0.2441,  0.0526, -0.1027,  0.1954,  0.0493,  0.2555,
+          0.0346, -0.0997],
+        [ 0.0850, -0.0858,  0.1331,  0.2823,  0.1828, -0.1382,  0.1825,  0.0566,
+          0.1606, -0.1927],
+        [-0.3130, -0.1222, -0.2426,  0.2595,  0.0911,  0.1310,  0.1000, -0.0055,
+          0.2475, -0.2247],
+        [ 0.0199, -0.2158,  0.0975, -0.1089,  0.0969, -0.0659,  0.2623, -0.1874,
+         -0.1886, -0.1886],
+        [ 0.2844,  0.1054,  0.3043, -0.2610, -0.3137, -0.2474, -0.2127,  0.1281,
+          0.1132,  0.2628],
+        [-0.1633, -0.2156,  0.1678, -0.1278,  0.1919, -0.0750,  0.1809, -0.2457,
+         -0.1596,  0.0964],
+        [ 0.0669, -0.0806,  0.1885,  0.2150, -0.2293, -0.1688,  0.2896, -0.1067,
+         -0.1121, -0.3060],
+        [-0.1811,  0.0790, -0.0417, -0.2295,  0.0074, -0.2160, -0.2683, -0.1741,
+         -0.2768, -0.2014],
+        [ 0.3161,  0.0597,  0.0974, -0.2949, -0.2077, -0.1053,  0.0494, -0.2783,
+         -0.1363, -0.1893],
+        [ 0.0009, -0.1177, -0.0219, -0.2143, -0.2171, -0.1845, -0.1082, -0.2496,
+          0.2651, -0.0628]]), 'layer_2.bias': tensor([ 0.2721,  0.0985, -0.2678,  0.2188, -0.0870, -0.1212, -0.2625, -0.3144,
+         0.0905, -0.0691]), 'layer_3.weight': tensor([[ 0.1231, -0.2595,  0.2348, -0.2321, -0.0546,  0.0661,  0.1633,  0.2553,
+          0.2881, -0.2507]]), 'layer_3.bias': tensor([0.0796])})
+"""
+
+
+loss_fn_2 = nn.BCEWithLogitsLoss()
+
+optimizer = torch.optim.SGD(params=model_3.parameters(),lr = 0.1)
+
+
+torch.manual_seed(42)
+
+epochs = 1000
+
+
+for epoch in range(epochs):
+
+    model_3.train()
+
+    y_logits = model_3(X_train).squeeze()
+
+    y_pred = torch.round((torch.sigmoid(y_logits)))
+
+    loss = loss_fn_2(y_logits,y_train)
+
+    acc = accuracy_fn(y_true=y_train,
+                      y_pred=y_pred)
+
+    optimizer.zero_grad()
+
+    loss.backward()
+
+    optimizer.step()
+
+    model_1.eval()
+    with torch.inference_mode():
+
+        test_logits = model_1(X_test).squeeze()
+
+        test_pred = torch.round(torch.sigmoid(test_logits))
+
+        # 2. Caculate loss/accuracy
+        test_loss = loss_fn(test_logits,
+                            y_test)
+
+        test_acc = accuracy_fn(y_true=y_test,
+                               y_pred=test_pred)
+
+    if epoch % 100 == 0:
+        print(
+            f"Epoch: {epoch} | Loss: {loss:.5f}, Accuracy: {acc:.2f}% | Test loss: {test_loss:.5f}, Test acc: {test_acc:.2f}%")
+
+"""
+Epoch: 0 | Loss: 0.69396, Accuracy: 50.88% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 100 | Loss: 0.69305, Accuracy: 50.38% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 200 | Loss: 0.69299, Accuracy: 51.12% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 300 | Loss: 0.69298, Accuracy: 51.62% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 400 | Loss: 0.69298, Accuracy: 51.12% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 500 | Loss: 0.69298, Accuracy: 51.00% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 600 | Loss: 0.69298, Accuracy: 51.00% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 700 | Loss: 0.69298, Accuracy: 51.00% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 800 | Loss: 0.69298, Accuracy: 51.00% | Test loss: 0.70071, Test acc: 46.50%
+Epoch: 900 | Loss: 0.69298, Accuracy: 51.00% | Test loss: 0.70071, Test acc: 46.50%
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+###################################### TESTING LINEAR NN
+
+
+
+weight = 0.7
+bias = 0.3
+start = 0
+end = 1
+step = 0.01
+
+# Create data
+X_regression = torch.arange(start, end, step).unsqueeze(dim=1)
+y_regression = weight * X_regression + bias # linear regression formula
+
+# Check the data
+print(len(X_regression))
+X_regression[:5], y_regression[:5]
+
+
+# Create train and test splits
+train_split = int(0.8 * len(X_regression)) # 80% of data used for training set
+X_train_regression, y_train_regression = X_regression[:train_split], y_regression[:train_split]
+X_test_regression, y_test_regression = X_regression[train_split:], y_regression[train_split:]
+
+# Check the lengths of each split
+print(len(X_train_regression),
+    len(y_train_regression),
+    len(X_test_regression),
+    len(y_test_regression))
+
+
+# Same architecture as model_1 (but using nn.Sequential)
+model_2 = nn.Sequential(
+    nn.Linear(in_features=1, out_features=10),
+    nn.Linear(in_features=10, out_features=10),
+    nn.Linear(in_features=10, out_features=1)
+)
+
+# Loss and optimizer
+loss_fn = nn.L1Loss()
+optimizer = torch.optim.SGD(model_2.parameters(), lr=0.1)
+
+# Train the model
+torch.manual_seed(42)
+
+# Set the number of epochs
+epochs = 1000
+
+# Put data to target device
+X_train_regression, y_train_regression = X_train_regression, y_train_regression
+X_test_regression, y_test_regression = X_test_regression, y_test_regression
+
+for epoch in range(epochs):
+    ### Training
+    # 1. Forward pass
+    y_pred = model_2(X_train_regression)
+
+    # 2. Calculate loss (no accuracy since it's a regression problem, not classification)
+    loss = loss_fn(y_pred, y_train_regression)
+
+    # 3. Optimizer zero grad
+    optimizer.zero_grad()
+
+    # 4. Loss backwards
+    loss.backward()
+
+    # 5. Optimizer step
+    optimizer.step()
+
+    ### Testing
+    model_2.eval()
+    with torch.inference_mode():
+        # 1. Forward pass
+        test_pred = model_2(X_test_regression)
+        # 2. Calculate the loss
+        test_loss = loss_fn(test_pred, y_test_regression)
+
+    # Print out what's happening
+    if epoch % 100 == 0:
+        print(f"Epoch: {epoch} | Train loss: {loss:.5f}, Test loss: {test_loss:.5f}")
+
+"""
+Epoch: 0 | Train loss: 0.75986, Test loss: 0.54143
+Epoch: 100 | Train loss: 0.09309, Test loss: 0.02901
+Epoch: 200 | Train loss: 0.07376, Test loss: 0.02850
+Epoch: 300 | Train loss: 0.06745, Test loss: 0.00615
+Epoch: 400 | Train loss: 0.06107, Test loss: 0.02004
+Epoch: 500 | Train loss: 0.05698, Test loss: 0.01061
+Epoch: 600 | Train loss: 0.04857, Test loss: 0.01326
+Epoch: 700 | Train loss: 0.06109, Test loss: 0.02127
+Epoch: 800 | Train loss: 0.05599, Test loss: 0.01426
+Epoch: 900 | Train loss: 0.05571, Test loss: 0.00603
+"""
+
+######################################
+
+
+
+
+
+
+
 
 
 
