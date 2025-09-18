@@ -22,7 +22,7 @@ X_blob, y_blob = make_blobs(n_samples=1000,
                             random_state=RANDOM_SEED)
 
 X_blob = torch.from_numpy(X_blob).type(torch.float)
-y_blob = torch.from_numpy(y_blob).type(torch.float)
+y_blob = torch.from_numpy(y_blob).type(torch.long)
 
 
 X_train, X_test, y_train, y_test = train_test_split(X_blob, y_blob, test_size=0.2,random_state=RANDOM_SEED)
@@ -82,7 +82,7 @@ print(model.state_dict)
 
 loss_fn = nn.CrossEntropyLoss()
 
-Optimizer = torch.optim.SGD(params = model.parameters(), lr=0.1)
+optimizer = torch.optim.SGD(params = model.parameters(), lr=0.1)
 
 
 
@@ -133,6 +133,175 @@ tensor([[0.6336, 0.2392, 0.0793, 0.0479],
         [0.4590, 0.2703, 0.1368, 0.1340],
         [0.6837, 0.2507, 0.0466, 0.0190]], grad_fn=<SliceBackward0>)
 """
+
+
+print(torch.sum(y_pred_probs[0]))
+#tensor(1., grad_fn=<SumBackward0>)
+
+
+print(torch.argmax(y_pred_probs[:5], 1))
+#tensor([0, 1, 3, 0, 2])
+
+
+
+
+
+
+
+
+
+
+
+def accuracy_fn(y_true, y_pred):
+    correct = torch.eq(y_true, y_pred).sum().item() # torch.eq() calculates where two tensors are equal
+    acc = (correct / len(y_pred)) * 100
+    return acc
+
+
+
+
+
+
+
+
+
+
+
+
+
+torch.manual_seed(42)
+
+epochs = 100
+
+for epoch in range(epochs):
+
+    model.train()
+
+    y_logits = model(X_train)
+
+    y_pred = torch.softmax(y_logits,dim=1).argmax(dim=1)
+
+    loss = loss_fn(y_logits,y_train)
+
+    acc = accuracy_fn(y_true=y_train,
+                      y_pred=y_pred)
+
+    optimizer.zero_grad()
+
+    loss.backward()
+
+    optimizer.step()
+
+    model.eval()
+    with torch.inference_mode():
+        test_logits = model(X_test)
+
+        test_pred = torch.softmax(test_logits,dim=1).argmax(dim=1)
+
+        test_loss = loss_fn(test_logits,y_test)
+
+        test_acc = accuracy_fn(y_true=y_test,
+                               y_pred=test_pred)
+
+    if epoch % 10 == 0:
+        print(
+            f"Epoch: {epoch} | Loss: {loss:.5f}, Acc: {acc:.2f}% | Test Loss: {test_loss:.5f}, Test Acc: {test_acc:.2f}%")
+"""
+Epoch: 0 | Loss: 1.82813, Acc: 26.12% | Test Loss: 0.66920, Test Acc: 87.00%
+Epoch: 10 | Loss: 0.27819, Acc: 88.75% | Test Loss: 0.22941, Test Acc: 90.50%
+Epoch: 20 | Loss: 0.09700, Acc: 99.12% | Test Loss: 0.08838, Test Acc: 99.50%
+Epoch: 30 | Loss: 0.06836, Acc: 99.12% | Test Loss: 0.06080, Test Acc: 99.50%
+Epoch: 40 | Loss: 0.05488, Acc: 99.12% | Test Loss: 0.04730, Test Acc: 99.50%
+Epoch: 50 | Loss: 0.04725, Acc: 99.12% | Test Loss: 0.03947, Test Acc: 99.50%
+Epoch: 60 | Loss: 0.04241, Acc: 99.12% | Test Loss: 0.03441, Test Acc: 99.50%
+Epoch: 70 | Loss: 0.03910, Acc: 99.12% | Test Loss: 0.03091, Test Acc: 99.50%
+Epoch: 80 | Loss: 0.03672, Acc: 99.12% | Test Loss: 0.02834, Test Acc: 99.50%
+Epoch: 90 | Loss: 0.03493, Acc: 99.12% | Test Loss: 0.02638, Test Acc: 99.50%
+"""
+
+
+
+
+
+
+epochs = 20
+
+for epoch in range(epochs):
+
+    model.train()
+
+    y_logits = model(X_train)
+
+    y_pred = torch.softmax(y_logits,dim=1).argmax(dim=1)
+
+    if epoch % 10 == 0:
+        print("Y_pred:  ",y_pred[:5])
+        print("Y_softmax:  ",torch.softmax(y_logits,dim=1)[:5])
+
+    loss = loss_fn(y_logits,y_train)
+
+    acc = accuracy_fn(y_true=y_train,
+                      y_pred=y_pred)
+
+    optimizer.zero_grad()
+
+    loss.backward()
+
+    optimizer.step()
+
+"""
+Y_pred:   tensor([1, 0, 2, 2, 0])
+Y_softmax:   tensor([[1.4380e-03, 9.9856e-01, 3.7903e-10, 5.8377e-09],
+        [9.9819e-01, 2.6553e-04, 9.6836e-08, 1.5434e-03],
+        [1.9149e-15, 6.3493e-19, 9.9992e-01, 8.4921e-05],
+        [2.5154e-09, 3.8297e-12, 9.9109e-01, 8.9124e-03],
+        [9.3376e-01, 2.6267e-04, 4.4243e-05, 6.5930e-02]],
+       grad_fn=<SliceBackward0>)
+Y_pred:   tensor([1, 0, 2, 2, 0])
+Y_softmax:   tensor([[1.1448e-03, 9.9886e-01, 1.7968e-10, 3.0073e-09],
+        [9.9855e-01, 2.0724e-04, 6.0850e-08, 1.2384e-03],
+        [6.5486e-16, 1.6066e-19, 9.9993e-01, 6.6085e-05],
+        [1.3402e-09, 1.6132e-12, 9.9215e-01, 7.8538e-03],
+        [9.3927e-01, 2.0498e-04, 3.3810e-05, 6.0495e-02]],
+       grad_fn=<SliceBackward0>)
+
+"""
+
+
+
+
+
+
+
+
+
+import requests
+from pathlib import Path
+
+# Download helper functions from Learn PyTorch repo (if not already downloaded)
+if Path("helper_functions.py").is_file():
+  print("helper_functions.py already exists, skipping download")
+else:
+  print("Downloading helper_functions.py")
+  request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/main/helper_functions.py")
+  with open("helper_functions.py", "wb") as f:
+    f.write(request.content)
+
+from helper_functions import plot_predictions, plot_decision_boundary
+
+
+
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.title("Train")
+plot_decision_boundary(model, X_train, y_train)
+plt.subplot(1, 2, 2)
+plt.title("Test")
+plot_decision_boundary(model, X_test, y_test)
+plt.show()
+
+
+
 
 
 
