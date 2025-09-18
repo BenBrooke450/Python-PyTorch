@@ -575,5 +575,212 @@ Epoch: 900 | Train loss: 0.05571, Test loss: 0.00603
 
 
 
+n_samples = 1000
+
+X, y = make_circles(n_samples,noise = 0.03,random_state=42)
+
+
+X = torch.from_numpy(X).type(torch.float)
+y = torch.from_numpy(y).type(torch.float)
+
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+
+
+
+print(X_train[:5],y_train[:5])
+"""
+tensor([[ 0.6579, -0.4651],
+        [ 0.6319, -0.7347],
+        [-1.0086, -0.1240],
+        [-0.9666, -0.2256],
+        [-0.1666,  0.7994]]) tensor([1., 0., 0., 0., 1.])
+"""
+
+
+class CircleModelV3(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.layer_1 = nn.Linear(in_features=2,out_features=10)
+        self.layer_2 = nn.Linear(in_features=10,out_features=10)
+        self.layer_3 = nn.Linear(in_features=10,out_features=1)
+        self.relu = nn.ReLU()
+
+    def forward(self,x):
+        return self.layer_3(self.relu(self.layer_2(self.relu(self.layer_1(x)))))
+
+
+model_4 = CircleModelV3()
+
+print(model_4)
+"""
+CircleModelV3(
+  (layer_1): Linear(in_features=2, out_features=10, bias=True)
+  (layer_2): Linear(in_features=10, out_features=10, bias=True)
+  (layer_3): Linear(in_features=10, out_features=2, bias=True)
+  (relu): ReLU()
+)
+"""
+
+
+
+# Loss and optimizer
+loss_fn = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.SGD(model_4.parameters(), lr=0.1)
+
+# Train the model
+torch.manual_seed(42)
+
+# Set the number of epochs
+epochs = 1000
+
+for epoch in range(epochs):
+    ### Training
+    # 1. Forward pass
+    model_4.train()
+
+    y_logits = model_4(X_train).squeeze()
+
+    y_pred = torch.round(torch.sigmoid(y_logits))
+
+    # 2. Calculate loss and accuracy
+    loss = loss_fn(y_logits, y_train)
+
+    acc = accuracy_fn(y_true=y_train,
+                      y_pred=y_pred)
+
+    # 3. Optimizer zero grad
+    optimizer.zero_grad()
+
+    # 4. Loss backwards
+    loss.backward()
+
+    # 5. Optimizer step
+    optimizer.step()
+
+    ### Testing
+    model_4.eval()
+    with torch.inference_mode():
+
+        # 1. Forward pass
+        test_logits = model_4(X_test).squeeze()
+
+        test_pred = torch.round(torch.sigmoid(test_logits))  # logits -> prediction probabilities -> prediction labels
+
+        # 2. Calculate loss and accuracy
+        test_loss = loss_fn(test_logits, y_test)
+        test_acc = accuracy_fn(y_true=y_test,
+                               y_pred=test_pred)
+
+    # Print out what's happening
+    if epoch % 100 == 0:
+        print(f"Epoch: {epoch} | Train Loss: {loss:.5f}, Train Accuracy: {acc:.2f}% | Test Loss: {test_loss:.5f}, Test Accuracy: {test_acc:.2f}%")
+
+"""
+Epoch: 0 | Train Loss: 0.69295, Train Accuracy: 50.00% | Test Loss: 0.69319, Test Accuracy: 50.00%
+Epoch: 100 | Train Loss: 0.69115, Train Accuracy: 52.88% | Test Loss: 0.69102, Test Accuracy: 52.50%
+Epoch: 200 | Train Loss: 0.68977, Train Accuracy: 53.37% | Test Loss: 0.68940, Test Accuracy: 55.00%
+Epoch: 300 | Train Loss: 0.68795, Train Accuracy: 53.00% | Test Loss: 0.68723, Test Accuracy: 56.00%
+Epoch: 400 | Train Loss: 0.68517, Train Accuracy: 52.75% | Test Loss: 0.68411, Test Accuracy: 56.50%
+Epoch: 500 | Train Loss: 0.68102, Train Accuracy: 52.75% | Test Loss: 0.67941, Test Accuracy: 56.50%
+Epoch: 600 | Train Loss: 0.67515, Train Accuracy: 54.50% | Test Loss: 0.67285, Test Accuracy: 56.00%
+Epoch: 700 | Train Loss: 0.66659, Train Accuracy: 58.38% | Test Loss: 0.66322, Test Accuracy: 59.00%
+Epoch: 800 | Train Loss: 0.65160, Train Accuracy: 64.00% | Test Loss: 0.64757, Test Accuracy: 67.50%
+Epoch: 900 | Train Loss: 0.62362, Train Accuracy: 74.00% | Test Loss: 0.62145, Test Accuracy: 79.00%
+"""
+
+
+
+
+
+
+model_4.eval()
+
+with torch.inference_mode():
+    y_preds = torch.round(torch.sigmoid(model_4(X_test))).squeeze()
+
+print(y_preds[:10] , y_test[:10])
+"""
+tensor([1., 0., 1., 0., 0., 1., 0., 0., 1., 0.]) 
+tensor([1., 0., 1., 0., 1., 1., 0., 0., 1., 0.])
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A = torch.arange(-10,10,1,dtype=torch.float32)
+
+import matplotlib.pyplot as plt
+
+#plt.plot(A)
+#plt.show()
+
+
+
+def relu(x: torch.tensor) -> torch.tensor:
+    return torch.maximum(torch.tensor(0),x)
+
+
+print(relu(A))
+#tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 2., 3., 4., 5., 6., 7., 8., 9.])
+
+#B = relu(A)
+#plt.plot(B)
+#plt.show()
+
+
+
+
+
+
+
+def sigmoid(x):
+    return 1 / (1+torch.exp(-x))
+
+print(sigmoid(A))
+"""
+tensor([4.5398e-05, 1.2339e-04, 3.3535e-04, 9.1105e-04, 2.4726e-03, 6.6929e-03,
+        1.7986e-02, 4.7426e-02, 1.1920e-01, 2.6894e-01, 5.0000e-01, 7.3106e-01,
+        8.8080e-01, 9.5257e-01, 9.8201e-01, 9.9331e-01, 9.9753e-01, 9.9909e-01,
+        9.9966e-01, 9.9988e-01])
+"""
+
+
+#plt.plot(sigmoid(A))
+#plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
