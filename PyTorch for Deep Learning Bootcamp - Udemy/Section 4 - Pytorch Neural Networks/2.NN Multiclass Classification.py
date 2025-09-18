@@ -275,33 +275,103 @@ Y_softmax:   tensor([[1.1448e-03, 9.9886e-01, 1.7968e-10, 3.0073e-09],
 
 
 
-import requests
-from pathlib import Path
-
-# Download helper functions from Learn PyTorch repo (if not already downloaded)
-if Path("helper_functions.py").is_file():
-  print("helper_functions.py already exists, skipping download")
-else:
-  print("Downloading helper_functions.py")
-  request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/main/helper_functions.py")
-  with open("helper_functions.py", "wb") as f:
-    f.write(request.content)
-
-from helper_functions import plot_predictions, plot_decision_boundary
 
 
 
-plt.figure(figsize=(12, 6))
-plt.subplot(1, 2, 1)
-plt.title("Train")
-plot_decision_boundary(model, X_train, y_train)
-plt.subplot(1, 2, 2)
-plt.title("Test")
-plot_decision_boundary(model, X_test, y_test)
-plt.show()
 
 
 
+
+
+
+
+
+
+
+
+import torch
+import numpy as np
+import plotly.graph_objects as go
+
+
+# Assume model, X_train, y_train, X_test, y_test are defined
+
+def create_decision_boundary(model, X, y, grid_steps=100):
+    # 1. Create a grid covering the data
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.linspace(x_min, x_max, grid_steps),
+                         np.linspace(y_min, y_max, grid_steps))
+
+    # 2. Predict for each point in the grid
+    grid = torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype=torch.float)
+    with torch.inference_mode():
+        logits = model(grid)
+        probs = torch.softmax(logits, dim=1)
+        preds = probs.argmax(dim=1).numpy()
+
+    # 3. Reshape to grid shape
+    Z = preds.reshape(xx.shape)
+    return xx, yy, Z
+
+
+# Create decision boundaries
+xx_train, yy_train, Z_train = create_decision_boundary(model, X_train, y_train)
+xx_test, yy_test, Z_test = create_decision_boundary(model, X_test, y_test)
+
+# Plot Train
+train_fig = go.Figure()
+
+# Add decision boundary as contour
+train_fig.add_trace(go.Contour(
+    x=xx_train[0],
+    y=yy_train[:, 0],
+    z=Z_train,
+    showscale=False,
+    colorscale='RdBu',
+    opacity=0.5,
+    contours=dict(showlines=False)
+))
+
+# Add training points
+train_fig.add_trace(go.Scatter(
+    x=X_train[:, 0].numpy(),
+    y=X_train[:, 1].numpy(),
+    mode='markers',
+    marker=dict(color=y_train.numpy(), colorscale='RdBu', line=dict(width=1)),
+    name='Train points'
+))
+
+train_fig.update_layout(title="Train", xaxis_title="Feature 1", yaxis_title="Feature 2")
+
+# Plot Test
+test_fig = go.Figure()
+
+# Add decision boundary as contour
+test_fig.add_trace(go.Contour(
+    x=xx_test[0],
+    y=yy_test[:, 0],
+    z=Z_test,
+    showscale=False,
+    colorscale='RdBu',
+    opacity=0.5,
+    contours=dict(showlines=False)
+))
+
+# Add test points
+test_fig.add_trace(go.Scatter(
+    x=X_test[:, 0].numpy(),
+    y=X_test[:, 1].numpy(),
+    mode='markers',
+    marker=dict(color=y_test.numpy(), colorscale='RdBu', line=dict(width=1)),
+    name='Test points'
+))
+
+test_fig.update_layout(title="Test", xaxis_title="Feature 1", yaxis_title="Feature 2")
+
+# Show figures
+train_fig.show()
+test_fig.show()
 
 
 
