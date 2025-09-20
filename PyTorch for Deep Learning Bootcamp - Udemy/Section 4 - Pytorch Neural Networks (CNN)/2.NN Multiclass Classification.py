@@ -370,8 +370,9 @@ test_fig.add_trace(go.Scatter(
 test_fig.update_layout(title="Test", xaxis_title="Feature 1", yaxis_title="Feature 2")
 
 # Show figures
-train_fig.show()
+"""train_fig.show()
 test_fig.show()
+"""
 
 
 
@@ -379,9 +380,16 @@ test_fig.show()
 
 
 
+from torchmetrics import Accuracy
 
+# Create the metric object
+accuracy = Accuracy(task="multiclass", num_classes=4)
 
+# Compute accuracy
+acc = accuracy(y_pred, y_train)
 
+print(acc)
+#tensor(0.9925)
 
 
 
