@@ -411,10 +411,10 @@ for epoch in tqdm(range(epochs)):
     ## Print out what's happening
     print(f"\nTrain loss: {train_loss:.5f} | Test loss: {test_loss:.5f}, Test acc: {ac:.2f}%\n")
 
-    # Calculate training time
-    train_time_end_on_cpu = timer()
-    total_train_time_model_0 = train_time(start=train_time_start_up,
-                                                end=train_time_start_up)
+# Calculate training time
+train_time_end = timer()
+total_train_time_model_0 = train_time(start=train_time_start_up,
+                                            end=train_time_end)
 
 """
 Epoch: 0
@@ -427,7 +427,7 @@ Looked at 51200/60000 samples.
  33%|███▎      | 1/3 [00:02<00:04,  2.22s/it]
 Train loss: 0.59039 | Test loss: 0.08506, Test acc: 0.88%
 
-Train time on 0.000 seconds
+
 Epoch: 1
 -----
 Looked at 0/60000 samples.
@@ -438,7 +438,7 @@ Looked at 51200/60000 samples.
  67%|██████▋   | 2/3 [00:04<00:02,  2.32s/it]
 Train loss: 0.47633 | Test loss: 0.08011, Test acc: 0.94%
 
-Train time on 0.000 seconds
+
 Epoch: 2
 -----
 Looked at 0/60000 samples.
@@ -449,7 +449,7 @@ Looked at 51200/60000 samples.
 
 Train loss: 0.45503 | Test loss: 0.07957, Test acc: 0.94%
 
-Train time on 0.000 seconds
+Train time on 7.459 seconds
 100%|██████████| 3/3 [00:06<00:00,  2.25s/it]
 """
 
