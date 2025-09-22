@@ -325,7 +325,7 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.1)
 
 from timeit import default_timer as timer
 
-def print_train_time(start,end):
+def train_time(start,end):
 
     """Print difference between start and end time"""
 
@@ -341,7 +341,117 @@ end_time = timer()
 
 
 
-print_train_time(start=start_time, end=end_time)
+
+train_time(start=start_time, end=end_time)
+
+
+
+
+from tqdm.auto import tqdm
+
+torch.manual_seed(42)
+
+train_time_start_up = timer()
+
+epochs = 3
+
+for epoch in tqdm(range(epochs)):
+    print(f"Epoch: {epoch}\n-----")
+
+    train_loss = 0
+
+    for batch, (X,y) in enumerate(train_dataloader):
+
+        model_0.train()
+
+        y_pred = model_0(X)
+
+        loss = loss_fn(y_pred,y)
+
+        train_loss += loss
+
+        optimizer.zero_grad()
+
+        loss.backward()
+
+        optimizer.step()
+
+        if batch % 400 == 0:
+            print(f"Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples.")
+
+    train_loss /= len(train_dataloader)
+
+    test_loss, test_acc = 0 , 0
+
+    model_0.eval()
+
+    with torch.inference_mode():
+
+        for X_test,y_test in test_dataloader:
+
+            test_pred = model_0(X_test)
+
+            test_loss += loss_fn(test_pred, y_test)
+
+            test_acc = Accuracy(task="multiclass", num_classes=len(train_data.classes))
+
+            test_pred = torch.argmax(test_pred, dim=1)
+
+            ac = test_acc(test_pred, y_test)  # tensor(1.) → 100%
+
+            ac =+ ac
+
+
+        # Calculate the test loss average per batch
+        test_loss /= len(train_dataloader)
+
+        # Calculate the test acc average per batch
+        test_acc /= len(test_dataloader)
+
+    ## Print out what's happening
+    print(f"\nTrain loss: {train_loss:.5f} | Test loss: {test_loss:.5f}, Test acc: {ac:.2f}%\n")
+
+    # Calculate training time
+    train_time_end_on_cpu = timer()
+    total_train_time_model_0 = train_time(start=train_time_start_up,
+                                                end=train_time_start_up)
+
+"""
+Epoch: 0
+-----
+  0%|          | 0/3 [00:00<?, ?it/s]Looked at 0/60000 samples.
+Looked at 12800/60000 samples.
+Looked at 25600/60000 samples.
+Looked at 38400/60000 samples.
+Looked at 51200/60000 samples.
+ 33%|███▎      | 1/3 [00:02<00:04,  2.22s/it]
+Train loss: 0.59039 | Test loss: 0.08506, Test acc: 0.88%
+
+Train time on 0.000 seconds
+Epoch: 1
+-----
+Looked at 0/60000 samples.
+Looked at 12800/60000 samples.
+Looked at 25600/60000 samples.
+Looked at 38400/60000 samples.
+Looked at 51200/60000 samples.
+ 67%|██████▋   | 2/3 [00:04<00:02,  2.32s/it]
+Train loss: 0.47633 | Test loss: 0.08011, Test acc: 0.94%
+
+Train time on 0.000 seconds
+Epoch: 2
+-----
+Looked at 0/60000 samples.
+Looked at 12800/60000 samples.
+Looked at 25600/60000 samples.
+Looked at 38400/60000 samples.
+Looked at 51200/60000 samples.
+
+Train loss: 0.45503 | Test loss: 0.07957, Test acc: 0.94%
+
+Train time on 0.000 seconds
+100%|██████████| 3/3 [00:06<00:00,  2.25s/it]
+"""
 
 
 
