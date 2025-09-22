@@ -291,12 +291,17 @@ FashMNISTModelV0(
 )
 """
 
-print(model_0.state_dict())
 
 
 
 
 
+
+dummy_x = torch.rand([1,1,28,28])
+
+print(model_0(dummy_x))
+"""tensor([[-0.0315,  0.3171,  0.0531, -0.2525,  0.5959,  0.2112,  0.3233,  0.2694,
+         -0.1004,  0.0157]], grad_fn=<AddmmBackward0>)"""
 
 
 

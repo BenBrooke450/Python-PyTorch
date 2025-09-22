@@ -1,6 +1,6 @@
 
 
-# **PyTorch `nn.Flatten` – Detailed Summary with Realistic Example**
+# **PyTorch `nn.Flatten`**
 
 ## **1️⃣ What is `nn.Flatten`?**
 
