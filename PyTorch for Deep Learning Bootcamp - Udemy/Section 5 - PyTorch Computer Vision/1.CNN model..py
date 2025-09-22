@@ -307,6 +307,67 @@ print(model_0(dummy_x))
 
 
 
+from torchmetrics import Accuracy
+
+
+loss_fn = nn.CrossEntropyLoss()
+
+optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.1)
+
+
+
+
+
+
+
+
+
+
+from timeit import default_timer as timer
+
+def print_train_time(start,end):
+
+    """Print difference between start and end time"""
+
+    total_time = end - start
+
+    print(f"Train time on {total_time:.3f} seconds")
+
+    return total_time
+
+start_time = timer()
+
+end_time = timer()
+
+
+
+print_train_time(start=start_time, end=end_time)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
