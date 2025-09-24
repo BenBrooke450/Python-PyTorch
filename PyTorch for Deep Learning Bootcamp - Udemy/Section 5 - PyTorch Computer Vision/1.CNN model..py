@@ -309,7 +309,6 @@ print(model_0(dummy_x))
 
 from torchmetrics import Accuracy
 
-
 loss_fn = nn.CrossEntropyLoss()
 
 optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.1)
@@ -413,8 +412,7 @@ for epoch in tqdm(range(epochs)):
 
 # Calculate training time
 train_time_end = timer()
-total_train_time_model_0 = train_time(start=train_time_start_up,
-                                            end=train_time_end)
+#total_train_time_model_0 = train_time(start=train_time_start_up, end=train_time_end)
 
 """
 Epoch: 0
@@ -452,6 +450,55 @@ Train loss: 0.45503 | Test loss: 0.07957, Test acc: 0.94%
 Train time on 7.459 seconds
 100%|██████████| 3/3 [00:06<00:00,  2.25s/it]
 """
+
+
+
+
+torch.manual_seed(42)
+
+def eval_model(model: torch.nn.Module,
+               data_loader: torch.utils.data.DataLoader,
+               loss_fn: torch.nn.Module,
+               accuracy):
+
+    loss, acc = 0, 0
+
+    model.eval()
+    with torch.inference_mode():
+        for X,y in tqdm(data_loader):
+            y_pred = model(X)
+
+            loss += loss_fn(y_pred,y)
+
+            test_acc = Accuracy(task="multiclass", num_classes=len(train_data.classes))
+
+            test_pred = torch.argmax(y_pred, dim=1)
+
+            acc += test_acc(test_pred, y)  # tensor(1.) → 100%
+
+        loss /= len(data_loader)
+        acc /= len(data_loader)
+
+    return {"model_name": model.__class__.__name__,
+            "model_loss": loss.item(),
+            "model_acc":acc}
+
+model_0_results = eval_model(model=model_0,
+                             data_loader=test_dataloader,
+                             loss_fn=loss_fn,
+                             accuracy=ac)
+
+print(model_0_results)
+#{'model_name': 'FashMNISTModelV0', 'model_loss': 0.47663894295692444, 'model_acc': tensor(0.8343)}
+
+
+
+
+
+
+
+
+
 
 
 
