@@ -1,5 +1,8 @@
 
 
+
+
+
 import torch
 from torch import nn
 import torchvision
@@ -241,8 +244,8 @@ from tqdm.auto import tqdm
 
 train_time_start = timer()
 
-epochs = 3
-for epoch in tqdm(range(epochs)):
+epochs = 4
+for epoch in range(epochs):
     print(f"Epoch: {epoch}\n---------")
     train_step(data_loader=train_dataloader,
                model=model_1,
@@ -261,6 +264,41 @@ for epoch in tqdm(range(epochs)):
 train_time_end = timer()
 
 train_time(start=train_time_start,end=train_time_end)
+
+"""
+Epoch: 0
+---------
+Train loss: 2.17934 | Train acc: 0.61412
+Test loss: 0.94960 | Test accuracy: 0.65%
+
+Epoch: 1
+---------
+Train loss: 1.85664 | Train acc: 0.65842
+Test loss: 0.94834 | Test accuracy: 0.67%
+
+Epoch: 2
+---------
+Train loss: 1.46557 | Train acc: 0.73432
+Test loss: 0.67461 | Test accuracy: 0.76%
+
+Epoch: 3
+---------
+Train loss: 1.28794 | Train acc: 0.76583
+Test loss: 0.65622 | Test accuracy: 0.76%
+
+Train time on 11.665 seconds
+"""
+
+
+
+
+
+
+
+
+
+
+
 
 
 
