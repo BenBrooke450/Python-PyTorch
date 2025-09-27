@@ -21,7 +21,6 @@ Here are several examples demonstrating how to use `torch.argmin()`:
 
 ```python
 import torch
-import torch
 
 # Example 1: Find the index of the minimum value in a 1D tensor
 tensor1 = torch.tensor([3, 1, 4, 1, 5, 9])
@@ -49,8 +48,21 @@ Indices of the minimum values along dim=0:
 
 
 
-# Example 3: Use keepdim to retain the same number of dimensions
-argmin3 = torch.argmin(tensor2, dim=1, keepdim=True)
+# Example 3
+x = torch.tensor([[3, 1, 4],
+                  [2, 8, 5],
+                  [7, 6, 9]])
+print(x.shape)  # (3, 3)
+
+values, indices = torch.max(x, dim=0)
+print(values)   # tensor([7, 8, 9])   → max of each column
+print(indices)  # tensor([2, 1, 2])   → row index of max in each column
+
+
+
+
+# Example 4: Use keepdim to retain the same number of dimensions
+argmin4 = torch.argmin(tensor2, dim=1, keepdim=True)
 print("Indices of the minimum values along dim=1 with keepdim=True:\n", argmin3)
 """
 Indices of the minimum values along dim=1 with keepdim=True:
@@ -61,9 +73,9 @@ Indices of the minimum values along dim=1 with keepdim=True:
 
 
 
-# Example 4: Find the index of the minimum value in a 3D tensor
+# Example 5: Find the index of the minimum value in a 3D tensor
 tensor3 = torch.tensor([[[3, 7], [2, 8]], [[5, 1], [9, 4]]])
-argmin4 = torch.argmin(tensor3)
+argmin5 = torch.argmin(tensor3)
 print("Index of the minimum value in 3D Tensor:", argmin4.item())
 #Index of the minimum value in 3D Tensor: 5
 
@@ -71,8 +83,8 @@ print("Index of the minimum value in 3D Tensor:", argmin4.item())
 
 
 
-# Example 5: Find the indices of the minimum values along a specific dimension in a 3D tensor
-argmin5 = torch.argmin(tensor3, dim=2)
+# Example 6: Find the indices of the minimum values along a specific dimension in a 3D tensor
+argmin6 = torch.argmin(tensor3, dim=2)
 print("Indices of the minimum values along dim=2 in 3D Tensor:\n", argmin5)
 """
 Indices of the minimum values along dim=2 in 3D Tensor:
