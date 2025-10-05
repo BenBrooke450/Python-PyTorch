@@ -135,3 +135,49 @@ print("Indices:\n", indices)
 | Common use         | CNNs, Autoencoders             |
 
 
+
+
+
+
+<br><br><br><br><br><br><br><br>
+
+## In `MaxPool2d`, the **stride** controls how many pixels the pooling window moves each time.
+
+* If `stride=1`, the window moves **one pixel at a time** → overlapping regions.
+* If `stride=2`, the window moves **two pixels at a time** → no overlap, jumps by 2 pixels.
+* If `stride` is not specified, it defaults to the same value as `kernel_size`.
+
+### Example:
+
+Input (4x4) with kernel_size=2:
+
+```
+[[ 1,  2,  3,  4],
+ [ 5,  6,  7,  8],
+ [ 9, 10, 11, 12],
+ [13, 14, 15, 16]]
+```
+
+**Stride = 2** → non-overlapping 2x2 windows:
+
+* Window 1: [[1,2],[5,6]] → max=6
+* Window 2: [[3,4],[7,8]] → max=8
+* Window 3: [[9,10],[13,14]] → max=14
+* Window 4: [[11,12],[15,16]] → max=16
+
+Output:
+
+```
+[[ 6,  8],
+ [14, 16]]
+```
+
+**Stride = 1** → overlapping windows, moves 1 pixel each time:
+
+* First 2x2 window: [[1,2],[5,6]] → max=6
+* Second window (shifted right by 1): [[2,3],[6,7]] → max=7
+* Third window (shifted right by 1): [[3,4],[7,8]] → max=8
+* And so on for each row → output shape becomes larger.
+
+So yes, the stride literally **jumps the window across the input** by that many pixels.
+
