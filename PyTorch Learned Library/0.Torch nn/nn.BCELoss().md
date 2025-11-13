@@ -133,3 +133,141 @@ print(loss.item())
 **In summary:**
 `torch.nn.BCELoss` implements the binary cross-entropy loss for probabilities. It’s conceptually simple but less numerically stable than `BCEWithLogitsLoss`. Use it if you explicitly want to apply `sigmoid` yourself, but in most cases, **`BCEWithLogitsLoss` is preferred**.
 
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+# ✅ `nn.BCEWithLogitsLoss`
+
+vs
+
+# ❌ `nn.BCELoss`
+
+And when to use which.
+
+---
+
+# **1. BCEWithLogitsLoss — the *correct* way (recommended)**
+
+`BCEWithLogitsLoss` **expects raw logits** and internally applies:
+
+```
+Sigmoid + BCE
+```
+
+Advantages:
+
+* more numerically stable
+* no need for `sigmoid()` in your model
+* prevents exploding/vanishing gradients
+
+---
+
+# CODE USING `BCEWithLogitsLoss`
+
+### **Model**
+
+**Do NOT use sigmoid in the forward pass.**
+
+```python
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(10, 1)
+
+    def forward(self, x):
+        return self.fc(x)    # raw logits
+```
+
+### **Loss**
+
+```python
+loss_fn = nn.BCEWithLogitsLoss()
+```
+
+### **Training step**
+
+```python
+logits = model(X)                # shape: [batch, 1]
+loss = loss_fn(logits, y.float())
+```
+
+### **Prediction**
+
+Apply sigmoid at evaluation time:
+
+```python
+probs = torch.sigmoid(logits)
+preds = (probs > 0.5).int()
+```
+
+---
+
+# **2. BCELoss — old method (not recommended)**
+
+`BCELoss` **expects probabilities**, so you MUST apply `sigmoid()` in the model or training loop.
+
+Problems:
+
+* unstable
+* NaNs if prob = 0 or 1
+* worse training behavior
+
+---
+
+# CODE USING `BCELoss`
+
+### **Model**
+
+**You MUST include sigmoid inside forward()**
+
+```python
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(10, 1)
+
+    def forward(self, x):
+        return torch.sigmoid(self.fc(x))  # probability
+```
+
+### **Loss**
+
+```python
+loss_fn = nn.BCELoss()
+```
+
+### **Training step**
+
+```python
+probs = model(X)
+loss = loss_fn(probs, y.float())
+```
+
+### **Prediction**
+
+Already probabilities, so:
+
+```python
+preds = (probs > 0.5).int()
+```
+
+---
+
+# Side-by-side comparison (TL;DR)
+
+| Task                | BCEWithLogitsLoss        | BCELoss                              |
+| ------------------- | ------------------------ | ------------------------------------ |
+| Model output        | **logits** (no sigmoid)  | **probabilities** (sigmoid required) |
+| Where sigmoid?      | **Inside loss function** | **Inside model**                     |
+| Numerical stability | ⭐ Best                   | ❌ Worse                              |
+| Recommended?        | **YES**                  | Only for special cases               |
+
+---
+
+# When to use which?
+
+* **Binary classification?** → `BCEWithLogitsLoss`
+* **Multi-label classification?** (e.g., 8 independent labels) → `BCEWithLogitsLoss`
+* **You really need probabilities inside forward()?** → `BCELoss`
