@@ -188,7 +188,7 @@ Eventually:
 
 ---
 
-# 🎯 **6. Common Patterns in CNN Architecture**
+# **6. Common Patterns in CNN Architecture**
 
 ### Typical convolution block:
 
@@ -208,7 +208,7 @@ nn.ReLU()
 
 ---
 
-# 🧪 **7. Small Practical Example**
+# **7. Small Practical Example**
 
 ```python
 import torch.nn as nn
@@ -232,7 +232,7 @@ class CNN(nn.Module):
 
 ---
 
-# 🏁 Final Summary (Very Clear)
+# Final Summary (Very Clear)
 
 | Concept      | Meaning                                 |
 | ------------ | --------------------------------------- |
