@@ -1,4 +1,152 @@
 
+# **What does `nn.Conv2d(in_channels, out_channels, kernel_size)` mean?**
+
+### **Example**
+
+```python
+nn.Conv2d(1, 16, 2)
+```
+
+This means:
+
+* **in_channels = 1**
+  → your input image has 1 channel (grayscale CT scan)
+
+* **out_channels = 16**
+  → this layer will produce **16 feature maps**
+
+* **kernel_size = 2**
+  → each convolution filter is **2 × 2**
+
+---
+
+# **How many filters does each Conv layer use?**
+
+* Conv layer 1: **16 filters**
+* Conv layer 2: **32 filters**
+* Conv layer 3: **32 filters**
+
+The number of filters **= out_channels**.
+
+---
+
+# **Why Conv2d(1 → 16) works**
+
+Your input image shape is:
+
+```
+[batch_size, 1, H, W]
+```
+
+⚡ The model applies **16 different convolution filters** over it → output shape becomes:
+
+```
+[batch_size, 16, H_out, W_out]
+```
+
+Now each feature map represents different learned features (edges, textures).
+
+---
+
+# **Your third conv layer is WRONG**
+
+You wrote:
+
+```python
+self.convo_layer_three = nn.Conv2d(64,32,2)
+```
+
+But your *previous* layer outputs **32 channels**, *not 64*.
+
+### Pipeline you have:
+
+Layer 1:
+`nn.Conv2d(1,16,2)` → outputs **16 channels**
+
+Layer 2:
+`nn.Conv2d(16,32,2)` → outputs **32 channels**
+
+Layer 3 should take **32 input channels**, not 64:
+
+❌ Wrong
+`nn.Conv2d(64,32,2)`
+
+✔️ Correct
+
+```python
+self.convo_layer_three = nn.Conv2d(32, 64, 2)
+```
+
+Or keep 32:
+
+```python
+self.convo_layer_three = nn.Conv2d(32, 32, 2)
+```
+
+**in_channels must equal out_channels of the previous conv.**
+
+---
+
+# **Why? Here is the flow:**
+
+### Conv1:
+
+```
+Input:  [1,   H, W]
+Output: [16, H1, W1]
+```
+
+### Conv2:
+
+```
+Input:  [16,  H1, W1]
+Output: [32, H2, W2]
+```
+
+### Conv3:
+
+```
+Input:  [32,  H2, W2]
+Output: [64, H3, W3]  <-- if you choose out_channels = 64
+```
+
+---
+
+# Updated Correct Model:
+
+```python
+class MedicalImageModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.conv1 = nn.Conv2d(1, 16, 2)
+        self.conv2 = nn.Conv2d(16, 32, 2)
+        self.conv3 = nn.Conv2d(32, 64, 2)
+
+    def forward(self, x):
+        x = torch.relu(self.conv1(x))
+        x = torch.relu(self.conv2(x))
+        x = torch.relu(self.conv3(x))
+        return x
+```
+
+---
+
+# TL;DR
+
+* **Input channels of a Conv2d MUST match output channels of the previous layer**
+* If layer1 is `(1 → 16)`, layer2 must be `(16 → something)`
+* If layer2 is `(16 → 32)`, layer3 must be `(32 → something)`
+* The third layer cannot randomly expect 64 input channels.
+
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+
+
 # **What is `nn.Conv2d`?**
 
 `nn.Conv2d` is the PyTorch layer used to scan **2D data** (images or image-like structures) using **learnable filters (kernels)**.
