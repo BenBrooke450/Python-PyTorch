@@ -260,3 +260,87 @@ preds = (probs > 0.5).int()
 * **Multi-label classification?** (e.g., 8 independent labels) → `BCEWithLogitsLoss`
 * **You really need probabilities inside forward()?** → `BCELoss`
 
+
+
+
+
+
+
+
+
+
+Short answer: **No — PyTorch’s `BCEWithLogitsLoss` does *not* have a built-in `"balanced"` option** like scikit-learn does.
+But you *can* manually create the exact same effect using `pos_weight=`.
+
+---
+
+# ✔ Why there is no `"balanced"` option
+
+In **scikit-learn**, many classifiers have:
+
+```
+class_weight="balanced"
+```
+
+because the library automatically computes:
+
+[
+\text{weight}*c = \frac{n*\text{samples}}{n_\text{classes} \times n_c}
+]
+
+PyTorch **does not** implement this for BCE.
+
+Instead, PyTorch gives you the **raw tools** to create the same effect manually.
+
+---
+
+# ✔ Equivalent PyTorch version of `"balanced"`
+
+For binary classification, class imbalance is handled using:
+
+```
+pos_weight=
+```
+
+This parameter modifies the loss for *positive examples* exactly like `"balanced"` would.
+
+### ✔ Compute it like this:
+
+```python
+pos = (y_train == 1).sum().item()
+neg = (y_train == 0).sum().item()
+
+balanced_pos_weight = neg / pos  # same formula sklearn uses
+pos_weight = torch.tensor([balanced_pos_weight])
+
+loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+```
+
+This gives you the **exact same effect** as:
+
+```
+class_weight="balanced"
+```
+
+---
+
+# ✔ Why this works
+
+`pos_weight` increases the loss contribution of positive samples:
+
+* If positives are rare → pos_weight becomes large
+* The model is penalized harder when it misses positives
+* Training becomes "balanced"
+
+This is mathematically equivalent to sklearn's approach.
+
+---
+
+# ✔ Summary
+
+| Library | Mechanism             | Option                    |
+| ------- | --------------------- | ------------------------- |
+| sklearn | Automatic balancing   | `class_weight="balanced"` |
+| PyTorch | Manual but equivalent | `pos_weight = neg / pos`  |
+
+So although PyTorch doesn’t have a literal `"balanced"` string option, you get the **same result** using `pos_weight`.
