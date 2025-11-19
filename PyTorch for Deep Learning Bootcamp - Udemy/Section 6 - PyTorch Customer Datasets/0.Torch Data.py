@@ -36,8 +36,6 @@ else:
 
 
 def walk_through_dir(dir_path):
-    """Walks through dir_path returning its contents."""
-
     for  dir_path, dirnames, filesnames in os.walk(dir_path):
         print(f"There  are {len(dirnames)}  directories and {len(filesnames)} images in '{dir_path}'.")
 
@@ -100,7 +98,7 @@ img_as_array = np.asarray(img)
 plt.figure(figsize=(10, 7))
 plt.imshow(img_as_array)
 plt.title(f"Image class: {image_class} | Image shape: {img_as_array.shape} -> [height, width, color_channels]")
-plt.axis(False);
+plt.axis(False)
 
 
 print(img_as_array)
@@ -161,8 +159,38 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 
-data_transform = transforms.Compose([])
+data_transform = transforms.Compose([
+        transforms.Resize(size=(64,64)),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.ToTensor()])
 
+
+
+
+
+
+def plot_transformed_images(image_paths, transform, n=3, seed=42):
+    random.seed(seed)
+    random_image_paths = random.sample(image_paths, k=n)
+    for image_path in random_image_paths:
+        with Image.open(image_path) as f:
+            fig, ax = plt.subplots(1, 2)
+            ax[0].imshow(f)
+            ax[0].set_title(f"Original \nSize: {f.size}")
+            ax[0].axis("off")
+
+
+            transformed_image = transform(f).permute(1, 2, 0)
+            ax[1].imshow(transformed_image)
+            ax[1].set_title(f"Transformed \nSize: {transformed_image.shape}")
+            ax[1].axis("off")
+
+            fig.suptitle(f"Class: {image_path.parent.stem}", fontsize=16)
+
+plot_transformed_images(image_path_list,
+                        transform=data_transform,
+                        n=3,
+                        seed= 42)
 
 
 
