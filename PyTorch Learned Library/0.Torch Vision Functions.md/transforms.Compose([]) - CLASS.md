@@ -1,253 +1,445 @@
 
-# **torchvision.transforms — Full Summary**
+# **Full Summary of `torchvision.transforms`**
 
-`torchvision.transforms` is a **module in PyTorch** that provides **common image transformations** for preprocessing and data augmentation. It is widely used when working with **computer vision datasets** and neural networks.
+`torchvision.transforms` is used to **preprocess**, **augment**, and **normalize** image data.
+There are **four major categories**:
 
----
+1. **Conversion transforms** (PIL ↔ Tensor ↔ other formats)
+2. **Geometric transforms** (resize, crop, flip, affine, rotate …)
+3. **Color transforms** (brightness, contrast, hue …)
+4. **Advanced augmentation policies** (AutoAugment, RandAugment, TrivialAugmentWide …)
 
-# **1. Purpose**
-
-Neural networks require **tensors of fixed size and numerical type** as input. Real-world images often vary in:
-
-* Size
-* Channels (RGB, grayscale)
-* Format (PIL image, NumPy array)
-* Dynamic content (e.g., lighting, orientation)
-
-`torchvision.transforms` helps with:
-
-1. **Data Preprocessing**
-
-   * Convert images to tensors
-   * Normalize pixel values
-   * Resize/crop images
-2. **Data Augmentation**
-
-   * Random rotations, flips, color jitter
-   * Introduces variation to reduce overfitting
-3. **Tensor Transformations**
-
-   * Compose multiple transformations into a pipeline
+I’ll cover **all transforms**, with **definitions & examples**.
 
 ---
 
-# **2. Basic Usage**
+# 1. **Conversion Transforms**
+
+## **1.1 ToTensor**
+
+Converts a PIL Image / numpy array → PyTorch tensor
+
+* Scales pixel values to **[0, 1]**
 
 ```python
-from torchvision import transforms
+transforms.ToTensor()
+```
 
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                         std=[0.229, 0.224, 0.225])
+---
+
+## **1.2 PILToTensor**
+
+Similar but NO scaling. Pixels stay 0–255.
+
+```python
+transforms.PILToTensor()
+```
+
+---
+
+## **1.3 ToPILImage**
+
+Convert tensor → PIL image
+
+```python
+transforms.ToPILImage()
+```
+
+---
+
+## **1.4 ConvertImageDtype**
+
+Changes tensor dtype (useful after ToTensor)
+
+```python
+transforms.ConvertImageDtype(torch.float32)
+```
+
+---
+
+# 2. **Geometric Transforms**
+
+## **2.1 Resize**
+
+Resizes image to given size.
+
+```python
+transforms.Resize((224, 224))
+```
+
+---
+
+## **2.2 CenterCrop**
+
+Crop the center of an image.
+
+```python
+transforms.CenterCrop(224)
+```
+
+---
+
+## **2.3 RandomCrop**
+
+Crop randomly.
+
+```python
+transforms.RandomCrop(128)
+```
+
+---
+
+## **2.4 FiveCrop & TenCrop**
+
+Produce 5 or 10 crops.
+
+```python
+transforms.FiveCrop(224)
+```
+
+---
+
+## **2.5 RandomResizedCrop**
+
+Crop + resize randomly (used in ImageNet & ViT training).
+
+```python
+transforms.RandomResizedCrop(224, scale=(0.5, 1.0))
+```
+
+---
+
+## **2.6 RandomHorizontalFlip / RandomVerticalFlip**
+
+Flip randomly.
+
+```python
+transforms.RandomHorizontalFlip(p=0.5)
+```
+
+---
+
+## **2.7 RandomRotation**
+
+Rotate randomly.
+
+```python
+transforms.RandomRotation(30)
+```
+
+---
+
+## **2.8 RandomAffine**
+
+General affine transform: rotate, translate, shear, scale.
+
+```python
+transforms.RandomAffine(
+    degrees=40,
+    translate=(0.1, 0.1),
+    scale=(0.8, 1.2),
+    shear=15
+)
+```
+
+---
+
+## **2.9 Pad**
+
+Add padding.
+
+```python
+transforms.Pad(10)
+```
+
+---
+
+## **2.10 RandomPerspective**
+
+Warp image with random perspective.
+
+```python
+transforms.RandomPerspective(distortion_scale=0.6)
+```
+
+---
+
+## **2.11 ElasticTransform**
+
+Elastic distortions (used in handwritten data augmentation)
+
+```python
+transforms.ElasticTransform(alpha=50.0)
+```
+
+---
+
+## **2.12 GaussianBlur**
+
+Apply Gaussian blurring.
+
+```python
+transforms.GaussianBlur(kernel_size=(5, 9))
+```
+
+---
+
+## **2.13 RandomErasing**
+
+Applied during training to erase random box regions (like CutOut).
+
+```python
+transforms.RandomErasing()
+```
+
+---
+
+# 3. **Color & Pixel Transforms**
+
+## **3.1 Normalize**
+
+Apply channel-wise normalization:
+
+```python
+transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                     std=[0.229, 0.224, 0.225])
+```
+
+---
+
+## **3.2 ColorJitter**
+
+Randomly change brightness, contrast, saturation, hue.
+
+```python
+transforms.ColorJitter(brightness=0.2, contrast=0.3)
+```
+
+---
+
+## **3.3 Grayscale**
+
+Convert image to grayscale.
+
+```python
+transforms.Grayscale(num_output_channels=1)
+```
+
+---
+
+## **3.4 RandomGrayscale**
+
+Randomly convert to grayscale.
+
+```python
+transforms.RandomGrayscale(p=0.1)
+```
+
+---
+
+## **3.5 RandomInvert**
+
+Invert colors.
+
+```python
+transforms.RandomInvert()
+```
+
+---
+
+## **3.6 RandomPosterize**
+
+Reduce bit depth.
+
+```python
+transforms.RandomPosterize(bits=3)
+```
+
+---
+
+## **3.7 RandomSolarize**
+
+Solarize (invert above threshold).
+
+```python
+transforms.RandomSolarize(threshold=128)
+```
+
+---
+
+## **3.8 RandomAdjustSharpness**
+
+Sharpen or unsharpen.
+
+```python
+transforms.RandomAdjustSharpness(sharpness_factor=2)
+```
+
+---
+
+## **3.9 RandomAutocontrast**
+
+Auto contrast.
+
+```python
+transforms.RandomAutocontrast()
+```
+
+---
+
+## **3.10 RandomEqualize**
+
+Equalize histogram.
+
+```python
+transforms.RandomEqualize()
+```
+
+---
+
+# 4. **Advanced Augmentation Policy Transforms**
+
+## **4.1 AutoAugment**
+
+Uses learned augmentation policies (from Google AutoAugment).
+
+```python
+transforms.AutoAugment()
+```
+
+Policies include
+
+* CIFAR10
+* ImageNet
+* SVHN
+
+---
+
+## **4.2 RandAugment**
+
+Applies N random transformations at varying magnitudes.
+
+```python
+transforms.RandAugment(num_ops=2, magnitude=9)
+```
+
+---
+
+## ⭐ **4.3 TrivialAugmentWide (YOU ASKED ABOUT THIS)**
+
+Applies **one random augmentation at random magnitude**.
+No tuning, simple, powerful.
+
+```python
+transforms.TrivialAugmentWide()
+```
+
+---
+
+## **4.4 AugMix**
+
+Creates mixed augmentations + convex combinations for stability.
+
+```python
+transforms.AugMix()
+```
+
+---
+
+## **4.5 RandomChoice**
+
+Choose one transform from a list.
+
+```python
+transforms.RandomChoice([transforms.RandomRotation(10),
+                         transforms.ColorJitter()])
+```
+
+---
+
+## **4.6 RandomApply**
+
+Apply a list of transforms with probability p.
+
+```python
+transforms.RandomApply(
+    [transforms.ColorJitter(), transforms.GaussianBlur(3)],
+    p=0.3
+)
+```
+
+---
+
+## **4.7 RandomOrder**
+
+Apply transforms in *random order*.
+
+```python
+transforms.RandomOrder([
+    transforms.RandomRotation(20),
+    transforms.ColorJitter()
 ])
 ```
 
-**Explanation:**
-
-* `Resize` → resizes the image to 224x224
-* `ToTensor` → converts PIL Image or NumPy array to PyTorch tensor `[C, H, W]` with values `[0,1]`
-* `Normalize` → standardizes tensor channels with mean & std
-
 ---
 
-# **3. Transform Pipelines**
+# 5. **Transforms for Video / Tensor-level**
 
-The standard approach is to use `transforms.Compose`:
+Torchvision v2 includes transforms that operate on:
+
+* Batched Tensors `(B, C, H, W)`
+* Videos `(T, C, H, W)`
+
+Examples:
 
 ```python
-transform = transforms.Compose([
-    transform1,
-    transform2,
-    transform3
-])
+transforms.v2.RandomResizedCrop(224)
+transforms.v2.Normalize(mean, std)
+transforms.v2.ColorJitter()
 ```
 
-* Applied **in order** from first to last
-* Example pipeline:
-
-  1. Resize
-  2. RandomCrop
-  3. ToTensor
-  4. Normalize
+These are identical in concept but **work on tensors instead of PIL images**.
 
 ---
 
-# **4. Key Transform Classes**
+# 6. **Functional API (torchvision.transforms.functional)**
 
-## **4.1 Basic Preprocessing**
-
-| Transform                          | Purpose                                                |
-| ---------------------------------- | ------------------------------------------------------ |
-| `Resize(size)`                     | Resize image to given size (tuple or int)              |
-| `CenterCrop(size)`                 | Crop center of image                                   |
-| `RandomCrop(size)`                 | Random crop                                            |
-| `Pad(padding)`                     | Pad the image                                          |
-| `Grayscale(num_output_channels=1)` | Convert to grayscale                                   |
-| `ToTensor()`                       | Convert PIL/Numpy image to torch.FloatTensor `[C,H,W]` |
-| `Normalize(mean, std)`             | Normalize tensor channels to zero mean/unit variance   |
-| `ConvertImageDtype(dtype)`         | Convert tensor to a different type (`float`, `int`)    |
-
----
-
-## **4.2 Data Augmentation / Randomization**
-
-| Transform                                            | Purpose                                                |
-| ---------------------------------------------------- | ------------------------------------------------------ |
-| `RandomHorizontalFlip(p=0.5)`                        | Flip horizontally with probability p                   |
-| `RandomVerticalFlip(p=0.5)`                          | Flip vertically                                        |
-| `RandomRotation(degrees)`                            | Rotate randomly by ±degrees                            |
-| `RandomAffine(degrees, translate, scale, shear)`     | Affine transformation: rotate, translate, scale, shear |
-| `RandomResizedCrop(size, scale, ratio)`              | Crop random part and resize                            |
-| `ColorJitter(brightness, contrast, saturation, hue)` | Randomly change image colors                           |
-| `RandomGrayscale(p=0.1)`                             | Convert to grayscale randomly                          |
-
----
-
-## **4.3 Advanced / Tensor-Specific**
-
-| Transform                          | Purpose                                             |
-| ---------------------------------- | --------------------------------------------------- |
-| `RandomErasing(p, scale, ratio)`   | Randomly erases a rectangle region in tensor        |
-| `GaussianBlur(kernel_size, sigma)` | Apply Gaussian blur                                 |
-| `Normalize(mean, std)`             | Normalize tensor channels                           |
-| `Lambda(lambd)`                    | Apply custom user-defined function                  |
-| `RandomApply(transforms, p=0.5)`   | Apply a sequence of transforms with probability p   |
-| `RandomChoice(transforms)`         | Apply **one** randomly chosen transform from a list |
-
----
-
-# **5. Difference Between PIL and Tensor Transforms**
-
-* **PIL Transforms:**
-  Works with PIL Images (common for most torchvision datasets). Examples: `Resize`, `RandomCrop`, `RandomHorizontalFlip`
-
-* **Tensor Transforms:**
-  Works on torch tensors `[C,H,W]` after `ToTensor()`. Examples: `Normalize`, `RandomErasing`
-
-**Important:** Always call `ToTensor()` **before** tensor-specific transforms.
-
----
-
-# **6. Normalization**
-
-Normalization rescales input tensor channels to have **zero mean and unit variance**:
+If you want direct function calls:
 
 ```python
-transforms.Normalize(mean=[0.485,0.456,0.406],
-                     std=[0.229,0.224,0.225])
+from torchvision.transforms import functional as F
+
+img = F.rotate(img, 45)
+img = F.adjust_brightness(img, 1.2)
+img = F.perspective(img, startpoints, endpoints)
 ```
 
-* Values are standard for pre-trained models (ImageNet)
-* Input tensor must be `[0,1]` (from `ToTensor`)
-* Output tensor: `(x - mean)/std`
+Good for writing **custom transforms**.
 
 ---
 
-# **7. Composing Complex Pipelines**
+# 7. **Custom Transforms**
+
+You can write your own:
 
 ```python
-transform = transforms.Compose([
-    transforms.RandomResizedCrop(224),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485,0.456,0.406],
-                         std=[0.229,0.224,0.225])
-])
-```
-
-* Random crop → horizontal flip → color jitter → tensor conversion → normalization
-* Each transformation is **applied sequentially**
-* Introduces stochasticity (for data augmentation)
-
----
-
-# **8. Applying Transforms to Datasets**
-
-Most `torchvision.datasets` support a `transform` argument:
-
-```python
-from torchvision.datasets import CIFAR10
-
-train_dataset = CIFAR10(root="./data", train=True, download=True,
-                        transform=transform)
-```
-
-* Each image is automatically transformed when accessed
-* Can combine with `DataLoader` for batching:
-
-```python
-from torch.utils.data import DataLoader
-
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+class MyTransform:
+    def __call__(self, img):
+        return F.invert(img)
 ```
 
 ---
 
-# **9. Custom Transform Functions**
+# Final Notes
 
-You can define your own transform using `transforms.Lambda` or a callable class:
+You now have the **complete and detailed list** of:
 
-```python
-class AddNoise:
-    def __call__(self, x):
-        return x + 0.1*torch.randn_like(x)
+* Basic transforms
+* Geometric transforms
+* Color transforms
+* Tensor & video transforms
+* Advanced augmentation (AutoAugment, RandAugment, AugMix, TrivialAugmentWide)
+* Functional transforms
+* Custom transforms
 
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    AddNoise()
-])
-```
 
-* Custom transform can be inserted anywhere in the pipeline
-* Allows complex augmentation not built-in
-
----
-
-# **10. Key Points / Best Practices**
-
-1. **Order matters:**
-
-   * Apply PIL transforms first, then `ToTensor()`, then tensor transforms like `Normalize`
-
-2. **Use Compose for multiple transforms**
-
-   * Keeps code clean and reproducible
-
-3. **Pretrained models expect normalized inputs**
-
-   * Always normalize with the correct `mean` and `std`
-
-4. **Random transforms introduce stochasticity**
-
-   * Use for **training**, not usually for **validation/test**
-
-5. **Transform consistency**
-
-   * For paired inputs (e.g., image + mask), ensure **same random transformation** is applied to both
-
----
-
-# **11. Summary Table of Common Transforms**
-
-| Category      | Transform                            | Notes                                |
-| ------------- | ------------------------------------ | ------------------------------------ |
-| Preprocessing | `Resize`, `CenterCrop`, `Pad`        | Works on PIL                         |
-| Conversion    | `ToTensor()`, `ConvertImageDtype`    | PIL/Numpy → Tensor                   |
-| Normalization | `Normalize(mean,std)`                | Tensor values `[0,1]` → standardized |
-| Augmentation  | `RandomHorizontalFlip`, `RandomCrop` | Adds stochasticity to training       |
-| Color         | `ColorJitter`, `Grayscale`           | Adjust image appearance              |
-| Advanced      | `RandomErasing`, `GaussianBlur`      | For tensors, adds robustness         |
-| Custom        | `Lambda`, callable class             | Define user-specific transforms      |
-
----
-
-# **12. Summary**
-
-* `torchvision.transforms` = **image preprocessing + augmentation toolbox**
-* Enables converting **raw images → normalized tensors** for neural networks
-* Supports **randomized augmentation** for training
-* Works with **PIL Images, NumPy arrays, and PyTorch tensors**
-* Combined with `Compose`, it allows **flexible, reproducible pipelines**
