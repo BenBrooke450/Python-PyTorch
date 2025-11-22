@@ -1,0 +1,10 @@
+setup.py
+module_nn/__init__.py
+module_nn/data_setup.py
+module_nn/engine.py
+module_nn/model_builder.py
+module_nn.egg-info/PKG-INFO
+module_nn.egg-info/SOURCES.txt
+module_nn.egg-info/dependency_links.txt
+module_nn.egg-info/requires.txt
+module_nn.egg-info/top_level.txt
