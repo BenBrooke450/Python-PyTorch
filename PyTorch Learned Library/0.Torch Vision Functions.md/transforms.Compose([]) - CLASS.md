@@ -25,7 +25,9 @@ Converts a PIL Image / numpy array → PyTorch tensor
 transforms.ToTensor()
 ```
 
----
+
+
+
 
 ## **1.2 PILToTensor**
 
@@ -441,5 +443,90 @@ You now have the **complete and detailed list** of:
 * Advanced augmentation (AutoAugment, RandAugment, AugMix, TrivialAugmentWide)
 * Functional transforms
 * Custom transforms
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+
+
+# ** `transforms.Compose` and other torchvision transforms**
+
+* **They do not add new images** to your dataset.
+* They **only alter the image that is passed to them**.
+* Each time you call the transform on an image, it produces a **new transformed version** of that image **in memory**, but it does **not save it** or create additional files unless you explicitly do so.
+
+---
+
+# ** Deterministic vs. random transforms**
+
+| Type                  | Example                                                 | Behavior                                                                |
+| --------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Deterministic         | `Resize`, `CenterCrop`, `ToTensor`, `Normalize`         | Every time the image passes through, the output is the **same**.        |
+| Random / Augmentation | `RandomHorizontalFlip`, `RandomRotation`, `ColorJitter` | Each time the image passes through, the output may **differ randomly**. |
+
+**Example:**
+
+```python
+from torchvision import transforms
+from PIL import Image
+
+img = Image.open("example.png")
+
+transform = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(30)
+])
+
+img1 = transform(img)
+img2 = transform(img)
+```
+
+* `img1` and `img2` can be **different** even though they came from the same original image.
+* Only **one transformed image** is produced **per call**.
+
+---
+
+# ** How this works in DataLoader / Dataset**
+
+* If you use a dataset like `ImageFolder`:
+
+```python
+dataset = ImageFolder(root="data/train", transform=train_transforms)
+```
+
+* Each **time a batch is loaded**, the transform is applied to **each image on the fly**.
+* Random transforms create **new variations each epoch**, but the **dataset size does not increase**.
+
+**Example:**
+
+* Original dataset = 1000 images
+* Training 10 epochs with random transforms = each epoch sees **different augmentations** of those 1000 images
+* Total images in memory = still 1000 per batch; you’re just showing **different versions each time**
+
+---
+
+# ** If you want to actually increase dataset size**
+
+* You would need to **save augmented images** to disk.
+* Example:
+
+```python
+img_aug = transform(img)
+img_aug.save("augmented_example.png")
+```
+
+* Or use libraries like **`torchvision.datasets` with `ImageFolder` + `torchvision.transforms`** in combination with **on-the-fly augmentation** (common in deep learning).
+
+---
+
+# **Summary**
+
+* `transforms.Compose` **does not duplicate images**.
+* Each call produces **one transformed image** in memory.
+* Random transforms = different variations per call.
+* Deterministic transforms = same output each time.
+* Dataset size is **unchanged**; augmentations are applied **on the fly** during training.
 
 
