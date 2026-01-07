@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/PyTorch for Deep Learning Bootcamp - Udemy/Section 8 - PyTorch Transfer Learning/pytorch-deep-learning" vcs="Git" />
   </component>
 </project>
